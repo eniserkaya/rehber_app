@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class SMSGonderPage extends StatefulWidget {
   Contact contact;
+  String sms;
 
   SMSGonderPage(this.contact);
 
@@ -12,14 +13,14 @@ class SMSGonderPage extends StatefulWidget {
 }
 
 class _SMSGonderPageState extends State<SMSGonderPage> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
           child: Text('Send'),
-          onPressed: () {
-            print("SMS GONDERİLECEK " + widget.contact.displayName);
-          }),
+          onPressed: _smsGonder),
       appBar: AppBar(
         actions: <Widget>[
           // action button
@@ -36,11 +37,42 @@ class _SMSGonderPageState extends State<SMSGonderPage> {
       ),
       body: Center(
           child: Container(
-        child: Text(
-          widget.contact.displayName,
-          style: TextStyle(fontSize: 150),
+        child: Form(
+          key: _formKey,
+          child: Container(
+            margin: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    maxLength: 300,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      labelText: 'Göndermek istediğiniz SMS İçeriği',
+                      labelStyle: TextStyle(color: Colors.red),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green),
+                      ),
+                    ),
+                    validator: (input) => input.length == 0
+                        ? 'SMS Alanını boş bırakmayınız.'
+                        : null,
+                    onSaved: (input) => widget.sms = input,
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       )),
     );
+  }
+
+  void _smsGonder() {
+    if(_formKey.currentState.validate()){
+      _formKey.currentState.save();
+      print("smsGıdecek!!!!!!!!!"+ widget.sms);
+    }
   }
 }
