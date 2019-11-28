@@ -34,13 +34,15 @@ class _SMSGonderPageState extends State<SMSGonderPage> {
           ),
         ],
       ),
-      body: Center(
-          child: Container(
-        child: Text(
-          widget.contact.displayName,
-          style: TextStyle(fontSize: 150),
-        ),
-      )),
+      body: Container(
+        child: Form(child: Container(
+          child: Column(
+            children: <Widget>[
+             TextFormField()
+            ],
+          ),
+        ),),
+      ),
     );
   }
 }

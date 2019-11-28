@@ -1,5 +1,6 @@
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rehber_app/sms_gonder_page.dart';
 
 void main() => runApp(MyApp());
@@ -11,15 +12,31 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   List _rehberList = new List();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  bool izin = false;
 
   @override
   void initState() {
-    rehberiGetir().then((rehber) {
-      var rehberList = rehber.toList();
+    izinIste().then((izinVerdiMi) {
+      if (izinVerdiMi) {
+        rehberiGetir().then((rehber) {
+          var rehberList = rehber.toList();
 
-      setState(() {
-        _rehberList = rehberList;
-      });
+          setState(() {
+            _rehberList = rehberList;
+            izin = izinVerdiMi;
+          });
+        });
+      } else {
+        setState(() {
+          izin = izinVerdiMi;
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text('İzin vermediğiniz için üzüldük'),
+            duration: Duration(seconds: 3),
+          ));
+        });
+      }
     });
   }
 
@@ -32,6 +49,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Text('Rehber'),
         ),
@@ -61,7 +79,15 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
-    ;
+  }
+
+  Future<bool> izinIste() async {
+    var result = await PermissionHandler()
+        .requestPermissions([PermissionGroup.contacts]);
+    if (result[PermissionGroup.contacts] == PermissionStatus.granted) {
+      return true;
+    }
+    return false;
   }
 }
 
